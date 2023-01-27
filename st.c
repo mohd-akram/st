@@ -40,12 +40,9 @@ const char *names[] = {
 	"venus"
 };
 
-const int br0 = 0;
-const int br1 = 1;
-const int br2 = 2;
-const int br3 = 3;
+enum bri { br0, br1, br2, br3 };
 
-const int points[] = {
+const enum bri points[] = {
 	br3,
 	br2,
 	br0,
@@ -358,7 +355,7 @@ void dscale(int s) {
 	sz = 30+6*s;
 }
 
-void intens(int i) {
+void intens(enum bri i) {
 	br = i+1;
 }
 
