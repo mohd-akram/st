@@ -381,11 +381,9 @@ void vecy(int y)
 	vec(xpos, ypos+y);
 }
 
-enum dir {
-	N, NE, E, SE, S, SW, W, NW
-};
+enum dir { N, NE, E, SE, S, SW, W, NW };
 
-void incr(int n, int dir)
+void incr(int n, enum dir dir)
 {
 	static int xtab[] = { 0, 1, 1, 1, 0, -1, -1, -1 };
 	static int ytab[] = { 1, 1, 0, -1, -1, -1, 0, 1 };
@@ -528,7 +526,7 @@ void dsplanet(int p)
 	incr(1, N); incr(1, W);
 }
 
-char cl[3] = " ";
+const char *cl = " ";
 
 void dispcl(void)
 {
@@ -864,7 +862,7 @@ void loop(void)
 		dsplanet(0);
 	}
 	/* loop4 */
-	strcpy(cl, crflg ? "CL" : lanflg ? "L" : " ");
+	cl = crflg ? "CL" : lanflg ? "L" : " ";
 }
 
 int main(void)
