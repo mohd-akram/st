@@ -293,12 +293,12 @@ double flt2float(struct flt flt)
 	}
 	i = 18;
 	while (c) {
-		m += (double) (c >> 17) / (1l<<i);
+		m += (double) (c >> 17) / (1ll<<i);
 		c <<= 1;
 		c &= 0777777;
 		++i;
 	}
-	return a > 0 ? s * m * (1l<<a) : s * m / (1l<<-a);
+	return a > 0 ? s * m * (1ll<<a) : s * m / (1ll<<-a);
 }
 
 double rpar, dpar;
