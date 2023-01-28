@@ -11,6 +11,8 @@ The SDL2 library is required.
 
 Run `make` to build `st`.
 
+Run `make install` to install to `/usr/local/bin`.
+
 ## Controls
 
 | Key | Action       |
