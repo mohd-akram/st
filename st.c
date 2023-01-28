@@ -492,11 +492,11 @@ void contrl(const SDL_Event *e)
 			case SDLK_2:
 				goflg = crflg = false;
 				break;
-			case SDLK_7:
+			case SDLK_7: case SDLK_DOWN:
 				++scale;
 				dspsca();
 				break;
-			case SDLK_8:
+			case SDLK_8: case SDLK_UP:
 				--scale;
 				dspsca();
 				break;
@@ -512,9 +512,9 @@ void contrl(const SDL_Event *e)
 		bacflg = true;
 		if (!goflg) lanflg = false;
 	}
-	if (pbson[SDL_SCANCODE_5])
+	if (pbson[SDL_SCANCODE_5] || pbson[SDL_SCANCODE_RIGHT])
 		rotate(false);
-	if (pbson[SDL_SCANCODE_6])
+	if (pbson[SDL_SCANCODE_6] || pbson[SDL_SCANCODE_LEFT])
 		rotate(true);
 }
 

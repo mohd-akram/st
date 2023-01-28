@@ -23,3 +23,5 @@ Run `make` to build `st`.
 | 6   | Yaw left     |
 | 7   | Scale up     |
 | 8   | Scale down   |
+
+You can also use the arrow keys for yaw and scale.
