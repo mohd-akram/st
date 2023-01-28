@@ -3,7 +3,8 @@
 #include <math.h>
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
+
+#include "font.h"
 
 const char *names[] = {
 	"sun",
@@ -392,19 +393,37 @@ void incr(int n, enum dir dir)
 	for (int i = 0; i < n; i++) vec(dx, dy);
 }
 
-TTF_Font *font;
+void dchar(char c)
+{
+	bool vis = false;
+	unsigned char *ch = font[c-32];
+	unsigned char ij;
+	int x = 0, y = 3;
+	while ((ij = *ch++) != 0xff) {
+		if (ij == 0x0f) vis = false;
+		else if (ij == 0x1f) vis = true;
+		else {
+			int x2 = ij & 0xf;
+			int y2 = 0xf - (ij >> 4);
+			int dx = x2-x;
+			int dy = y2-y;
+			if (vis) vec(sz*dx, sz*dy);
+			else {
+				xpos += sz*dx;
+				ypos += sz*dy;
+			}
+			x += dx;
+			y += dy;
+		}
+	}
+	xpos += sz*(13-x);
+	ypos += sz*(3-y);
+}
 
 void chars(const char *s)
 {
 	if (blnk && !show) return;
-	TTF_SetFontSize(font, 20*sz);
-	SDL_Color white = { 255*br/4, 255*br/4, 255*br/4, 255 };
-	SDL_Surface* text = TTF_RenderText_Solid(font, s, white);
-	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, text);
-	SDL_Rect dest = { xpos, SCREEN_HEIGHT-ypos-text->h, text->w, text->h };
-	SDL_RenderCopy(renderer, texture, NULL, &dest);
-	SDL_DestroyTexture(texture);
-	SDL_FreeSurface(text);
+	while (*s) dchar(*s++);
 }
 
 int inscr(int a)
@@ -913,9 +932,6 @@ int main(void)
 
 	SDL_SetWindowTitle(window, "Space Travel");
 
-	TTF_Init();
-	font = TTF_OpenFont("RobotoMono-VariableFont_wght.ttf", 20*sz);
-
 	pbson = SDL_GetKeyboardState(NULL);
 
 	SDL_Event e;
@@ -936,8 +952,6 @@ int main(void)
 		SDL_Delay(1000/60);
 	}
 
-	TTF_CloseFont(font);
-	TTF_Quit();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();

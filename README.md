@@ -7,7 +7,7 @@ in the [pdp7-unix](https://github.com/DoctorWkt/pdp7-unix) repository.
 
 ## Install
 
-The SDL2 and SDL2_ttf libraries are required.
+The SDL2 library is required.
 
 Run `make` to build `st`.
 
