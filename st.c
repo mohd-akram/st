@@ -332,7 +332,7 @@ double sdphi, cdphi;
 
 int xpos = 0;
 int ypos = 0;
-int sz = 30;
+int sz = 1;
 int br = 1;
 bool blnk = false;
 bool show = true;
@@ -352,7 +352,7 @@ void dsety(int y)
 }
 
 void dscale(int s) {
-	sz = 30+6*s;
+	sz = 1<<s;
 }
 
 void intens(enum bri i) {
@@ -366,19 +366,19 @@ void blink(bool s) {
 void vec(int x, int y)
 {
 	SDL_SetRenderDrawColor(renderer, 255*br/4, 255*br/4, 255*br/4, 255);
-	SDL_RenderDrawLine(renderer, xpos, SCREEN_HEIGHT-ypos, x, SCREEN_HEIGHT-y);
-	xpos = x;
-	ypos = y;
+	SDL_RenderDrawLine(renderer, xpos, SCREEN_HEIGHT-ypos, xpos+x, SCREEN_HEIGHT-(ypos+y));
+	xpos += x;
+	ypos += y;
 }
 
 void vecx(int x)
 {
-	vec(xpos+x, ypos);
+	vec(x, 0);
 }
 
 void vecy(int y)
 {
-	vec(xpos, ypos+y);
+	vec(0, y);
 }
 
 enum dir { N, NE, E, SE, S, SW, W, NW };
@@ -389,8 +389,7 @@ void incr(int n, enum dir dir)
 	static int ytab[] = { 1, 1, 0, -1, -1, -1, 0, 1 };
 	int dx = xtab[dir];
 	int dy = ytab[dir];
-	for (int i = 0; i < n; i++)
-		vec(xpos+dx, ypos+dy);
+	for (int i = 0; i < n; i++) vec(dx, dy);
 }
 
 TTF_Font *font;
@@ -398,7 +397,7 @@ TTF_Font *font;
 void chars(const char *s)
 {
 	if (blnk && !show) return;
-	TTF_SetFontSize(font, sz);
+	TTF_SetFontSize(font, 20*sz);
 	SDL_Color white = { 255*br/4, 255*br/4, 255*br/4, 255 };
 	SDL_Surface* text = TTF_RenderText_Solid(font, s, white);
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, text);
@@ -428,6 +427,7 @@ char sca[4] = " ";
 void dssca(void)
 {
 	chars(sca);
+	dscale(0);
 	dsetx(127);
 	dsety(250);
 	vecx(768);
@@ -553,7 +553,6 @@ void displist(void)
 	namedsp();
 	dsetx(400);
 	dsety(20);
-	dscale(0);
 	dssca();
 }
 
@@ -702,7 +701,7 @@ bool surf(int nt, int setx, int sety, double wx, double wy, double v, double vv)
 		if (!res) return false;
 		int delx = res + tsetx;
 		tsetx -= delx;
-		vec(xpos+delx, ypos+dely);
+		vec(delx, dely);
 	}
 	return true;
 }
@@ -915,7 +914,7 @@ int main(void)
 	SDL_SetWindowTitle(window, "Space Travel");
 
 	TTF_Init();
-	font = TTF_OpenFont("RobotoMono-VariableFont_wght.ttf", sz);
+	font = TTF_OpenFont("RobotoMono-VariableFont_wght.ttf", 20*sz);
 
 	pbson = SDL_GetKeyboardState(NULL);
 
