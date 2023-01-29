@@ -364,22 +364,26 @@ void blink(bool s) {
 	blnk = s;
 }
 
-void vec(int x, int y)
+void vec(int x, int y, bool vis)
 {
-	SDL_SetRenderDrawColor(renderer, 255*br/4, 255*br/4, 255*br/4, 255);
-	SDL_RenderDrawLine(renderer, xpos, SCREEN_HEIGHT-ypos, xpos+x, SCREEN_HEIGHT-(ypos+y));
-	xpos += x;
-	ypos += y;
+	if (vis) {
+		SDL_SetRenderDrawColor(renderer, 255*br/4, 255*br/4, 255*br/4,
+			255);
+		SDL_RenderDrawLine(renderer, xpos, SCREEN_HEIGHT-ypos,
+			xpos+sz*x, SCREEN_HEIGHT-(ypos+sz*y));
+	}
+	xpos += sz*x;
+	ypos += sz*y;
 }
 
 void vecx(int x)
 {
-	vec(x, 0);
+	vec(x, 0, true);
 }
 
 void vecy(int y)
 {
-	vec(0, y);
+	vec(0, y, true);
 }
 
 enum dir { N, NE, E, SE, S, SW, W, NW };
@@ -390,7 +394,7 @@ void incr(int n, enum dir dir)
 	static int ytab[] = { 1, 1, 0, -1, -1, -1, 0, 1 };
 	int dx = xtab[dir];
 	int dy = ytab[dir];
-	for (int i = 0; i < n; i++) vec(dx, dy);
+	for (int i = 0; i < n; i++) vec(dx, dy, true);
 }
 
 void dchar(char c)
@@ -407,17 +411,12 @@ void dchar(char c)
 			int y2 = 0xf - (ij >> 4);
 			int dx = x2-x;
 			int dy = y2-y;
-			if (vis) vec(sz*dx, sz*dy);
-			else {
-				xpos += sz*dx;
-				ypos += sz*dy;
-			}
+			vec(dx, dy, vis);
 			x += dx;
 			y += dy;
 		}
 	}
-	xpos += sz*(13-x);
-	ypos += sz*(3-y);
+	vec(13-x, 3-y, false);
 }
 
 void chars(const char *s)
@@ -720,7 +719,7 @@ bool surf(int nt, int setx, int sety, double wx, double wy, double v, double vv)
 		if (!res) return false;
 		int delx = res + tsetx;
 		tsetx -= delx;
-		vec(delx, dely);
+		vec(delx, dely, true);
 	}
 	return true;
 }
