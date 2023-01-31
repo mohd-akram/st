@@ -319,7 +319,7 @@ int par;
 double stheta = 1, ctheta = 0;
 int scale = 0;
 
-/** Constants */
+/* Constants */
 const int nplan = 32;
 const int vscale = 6;
 const double ascale = -0.5;
@@ -574,9 +574,10 @@ void displist(void)
 	dssca();
 }
 
+/* Update planet position */
 void updpln(int p)
 {
-	// update planet position
+	// rotate by a (pw[p] = cos(a), pww[p] = sin(a))
 	double ftmp1 = px[p];
 	px[p] = px[p] * pw[p] - py[p] * pww[p];
 	py[p] = ftmp1 * pww[p] + py[p] * pw[p];
@@ -606,6 +607,7 @@ void absv(int p)
 	}
 }
 
+/* Get absolute planet position */
 void absxy(int p)
 {
 	// get distance from planet to sun
@@ -620,17 +622,19 @@ void absxy(int p)
 	return;
 }
 
+/* Set absolute ship position */
 void shipxy(void)
 {
 	shipx = -(absx + x);
 	shipy = -(absy + y);
 }
 
-void upda2(int p)
+/* Update ship acceleration from planet gravity */
+void updacc(int p)
 {
-	// change absx and absy from distance from planet to sun
-	// to distance from ship to planet
+	// set absx and absy to distance from ship to planet
 	if (p != par) {
+		absxy(p);
 		absx += shipx;
 		absy += shipy;
 	} else {
@@ -661,7 +665,7 @@ void upda2(int p)
 				oy = y;
 				absxy(par);
 				shipxy();
-				upda2(par);
+				updacc(par);
 			}
 		}
 	}
@@ -691,13 +695,7 @@ void upda2(int p)
 	ay += ftmp1 * absy;
 }
 
-void updacc(int p)
-{
-	// optimization
-	if (p != par) absxy(p);
-	upda2(p);
-}
-
+/* Draw circle */
 bool surf(int nt, int setx, int sety, double wx, double wy, double v, double vv)
 {
 	int tsetx = -setx;
@@ -708,6 +706,7 @@ bool surf(int nt, int setx, int sety, double wx, double wy, double v, double vv)
 	double twy = wy;
 	v = -v;
 	for (int i = 0; i < nt; i++) {
+		// rotate by a (vv = cos(a), v = sin(a))
 		double ftmp2 = vv * twx - v * twy;
 		twy = vv * twy + v * twx;
 		int res = inscr(twy + spy);
@@ -724,6 +723,7 @@ bool surf(int nt, int setx, int sety, double wx, double wy, double v, double vv)
 	return true;
 }
 
+/* Draw planet circle */
 void drcirc(int p)
 {
 	if (grvflg) return;
@@ -760,6 +760,9 @@ void drcirc(int p)
 	}
 
 	dtmp1 = b;
+	// v ~= sin(x) ~= x (at x ~ 0)
+	// vv ~= cos(x) = sqrt(1 - sin2(x)) ~= 1 - sin2(x)/2
+	// (taylor series expansion sqrt(1 - x^2) = 1 - x^2/2 + ...)
 	double v = (2*M_PI) / dtmp1;
 	double vv = 1 - (v*v)/2;
 
@@ -768,7 +771,7 @@ void drcirc(int p)
 	surf(narcs, setx, sety, wx, wy, -v, vv);
 }
 
-/** Display planet */
+/* Display planet */
 void displa(int p)
 {
 	if (p == locpar) {
@@ -797,6 +800,7 @@ void displa(int p)
 	drcirc(p);
 }
 
+/* Update ship thrust acceleration and position */
 void updshp(void)
 {
 	if (forflg || bacflg) {
@@ -858,7 +862,7 @@ void loop(void)
 	// if not game over
 	if (!goflg) {
 		ax = ay = maxa = 0;
-		/** loop1 */
+		/* loop1 */
 		// update acceleration and draw planets
 		for (int i = 0; i < nplan; i++) {
 			updacc(i);
