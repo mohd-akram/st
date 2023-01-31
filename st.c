@@ -751,15 +751,15 @@ void drcirc(int p)
 	wx -= spx;
 
 	int narcs;
-	double b = dtmp1 * M_PI/10;
-	if (b > 400) narcs = 400;
+	dtmp1 = dtmp1 * M_PI/10;
+	if (dtmp1 > 400) narcs = 400;
 	else {
-		if (b - 20 < 0) b = 0;
-		b += 20;
-		narcs = b;
+		narcs = dtmp1;
+		if (narcs < 20) narcs = 0;
+		narcs += 20;
+		dtmp1 = narcs;
 	}
 
-	dtmp1 = b;
 	// v ~= sin(x) ~= x (at x ~ 0)
 	// vv ~= cos(x) = sqrt(1 - sin2(x)) ~= 1 - sin2(x)/2
 	// (taylor series expansion sqrt(1 - x^2) = 1 - x^2/2 + ...)
