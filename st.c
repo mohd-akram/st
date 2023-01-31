@@ -874,7 +874,7 @@ void loop(void)
 		if (!lanflg) updshp();
 	}
 	/* loop3 */
-	int mul = vscale - scale;
+	int mul = vscale - scale - 1;
 	double h = mul > 0 ? horizv * (1<<mul) : horizv / (1<<-mul);
 	int res = inscr(h);
 	if (res) {
