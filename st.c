@@ -807,7 +807,7 @@ void updshp(void)
 		double a = forflg && bacflg ? 0 :
 			scale > 0 ? ascale * (1<<scale) : ascale / (1<<-scale);
 		if (bacflg) a = -a;
-		if (accflg) a += maxa;
+		if (forflg && accflg) a += maxa;
 		a = -a;
 		ax += a * ctheta;
 		ay += a * stheta;
