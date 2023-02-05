@@ -43,6 +43,7 @@ const char *names[] = {
 
 enum bri { br0, br1, br2, br3 };
 
+// Planet brightness
 const enum bri points[] = {
 	br3,
 	br2,
@@ -78,6 +79,7 @@ const enum bri points[] = {
 	br2
 };
 
+// Planet orbit index
 const int ppar[] = {
 	0,0,036,015,01,016,031,031,
 	015,015,031,031,015,0,0,0,
@@ -92,6 +94,9 @@ struct flt {
 	int m2;		// 18-36
 };
 
+/* All values use earth's radius as the base distance unit (RE) */
+
+// Planet radius squared
 double prsq[32];
 const struct flt prsq_[] = {
 	{016,0272245,075341},
@@ -128,6 +133,7 @@ const struct flt prsq_[] = {
 	{0,0362406,0}
 };
 
+// Planet GM values
 double accl[32];
 const struct flt accl_[] = {
 	{0,0204365,0},
@@ -164,6 +170,7 @@ const struct flt accl_[] = {
 	{-023,0252667,0}
 };
 
+// Planet x position from orbit center
 double px[32];
 const struct flt px_[] = {
 	{0,000000,0},
@@ -200,6 +207,7 @@ const struct flt px_[] = {
 	{016,0233751,0}
 };
 
+// Planet y position from orbit center
 double py[32];
 const struct flt py_[] = {
 	{000,0000000,0},
@@ -238,6 +246,7 @@ const struct flt py_[] = {
 
 double pw[32];
 
+// Planet orbit velocity in radians squared
 double pww[32];
 const struct flt pww_[] = {
 	{0000,0000000,0000000},
