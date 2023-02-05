@@ -934,7 +934,7 @@ int main(void)
 
 	if (SDL_CreateWindowAndRenderer(
 		SCREEN_WIDTH, SCREEN_HEIGHT,
-		SDL_WINDOW_SHOWN, &window, &renderer
+		SDL_WINDOW_FULLSCREEN|SDL_WINDOW_SHOWN, &window, &renderer
 	)) {
 		fprintf(stderr, "Failed to create window: %s\n",
 			SDL_GetError());
