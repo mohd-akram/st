@@ -27,3 +27,24 @@ Run `make install` to install to `/usr/local/bin`.
 | 8   | Scale down   |
 
 You can also use the arrow keys for yaw and scale.
+
+## Gameplay
+
+> For controls, there were several buttons: jet forward, jet back, turn left,
+> turn right; go up scale on the display, go down scale. The acceleration of
+> the ship was fixed, but it scaled with the display scale--it was thus fixed
+> in terms of pixels/sec/sec. Normally the ship was in the center of the screen
+> and always pointed up; the display showed the plan view of the solar system,
+> so that the "rotate" controls rotated the solar system around you on the
+> display.
+>
+> No relativity; scale up enough and you travel to Pluto in a few seconds. But
+> don't scale up too much, or you might not find the Solar System again without
+> restarting.
+>
+> The object of the game was simply to fly around, get into orbits, land.
+> "Land" meant to cross the surface with a small enough speed.
+>
+> *[Space Travel: Exploring the solar system and the
+> PDP-7](https://www.bell-labs.com/usr/dmr/www/spacetravel.html) by Dennis
+> Ritchie*
