@@ -13,6 +13,12 @@ Run `make` to build `st`.
 
 Run `make install` to install to `/usr/local/bin`.
 
+### Build and Run on OSX
+
+    brew install sdl2
+    gcc -I/opt/homebrew/Cellar/sdl2/2.26.2/include -D_THREAD_SAFE -L/opt/homebrew/Cellar/sdl2/2.26.2/lib -lSDL2 st.c
+    ./a.out
+
 ## Controls
 
 | Key | Action       |
