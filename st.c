@@ -347,17 +347,28 @@ int br = 1;
 bool blnk = false;
 bool show = true;
 
-const int SCREEN_WIDTH = 1024;
-const int SCREEN_HEIGHT = 1024;
+int window_width = 1024;
+int window_height = 1024;
+double wscale = 1;
 SDL_Renderer *renderer = NULL;
+
+#define max(a,b) ((a) > (b) ? (a) : (b))
+#define min(a,b) ((a) < (b) ? (a) : (b))
 
 void dsetx(int x)
 {
+	// ensure planet name is in view
+	x -= x < 127 ? min(512, window_width/(2*wscale)) : 512;
 	xpos = x;
 }
 
 void dsety(int y)
 {
+	y -= y < 250 ?
+		// ensure info is in view
+		min(512, window_height/(2*wscale)) :
+		// ensure main view is in view
+		max(512, 1024 - window_height/(2*wscale));
 	ypos = y;
 }
 
@@ -378,8 +389,11 @@ void vec(int x, int y, bool vis)
 	if (vis) {
 		SDL_SetRenderDrawColor(renderer, 255*br/4, 255*br/4, 255*br/4,
 			255);
-		SDL_RenderDrawLine(renderer, xpos, SCREEN_HEIGHT-ypos,
-			xpos+sz*x, SCREEN_HEIGHT-(ypos+sz*y));
+		SDL_RenderDrawLine(renderer,
+			wscale*xpos+window_width/2,
+			window_height-(wscale*ypos+window_height/2),
+			wscale*(xpos+sz*x)+window_width/2,
+			window_height-(wscale*(ypos+sz*y)+window_height/2));
 	}
 	xpos += sz*x;
 	ypos += sz*y;
@@ -933,8 +947,8 @@ int main(void)
 	SDL_Window *window;
 
 	if (SDL_CreateWindowAndRenderer(
-		SCREEN_WIDTH, SCREEN_HEIGHT,
-		SDL_WINDOW_SHOWN, &window, &renderer
+		window_width, window_height,
+		SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE, &window, &renderer
 	)) {
 		fprintf(stderr, "Failed to create window: %s\n",
 			SDL_GetError());
@@ -943,6 +957,13 @@ int main(void)
 	}
 
 	SDL_SetWindowTitle(window, "Space Travel");
+	SDL_SetWindowMinimumSize(window, 848, 848);
+
+	SDL_DisplayMode dm;
+	SDL_GetDesktopDisplayMode(SDL_GetWindowDisplayIndex(window), &dm);
+	int size = min(min(dm.w, dm.h)-128, 1024);
+	window_width = window_height = size;
+	SDL_SetWindowSize(window, window_width, window_height);
 
 	pbson = SDL_GetKeyboardState(NULL);
 
@@ -951,6 +972,16 @@ int main(void)
 	while (!quit) {
 		while (SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) quit = true;
+			else if (
+				e.type == SDL_WINDOWEVENT &&
+				e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED
+			) {
+				window_width = e.window.data1;
+				window_height = e.window.data2;
+				wscale = max(
+					min(window_width, window_height), 1024
+				) / 1024.0;
+			}
 			else contrl(&e);
 		}
 		contrl(NULL);
