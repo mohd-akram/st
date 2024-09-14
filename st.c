@@ -3,6 +3,9 @@
 #include <math.h>
 
 #include <SDL2/SDL.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "font.h"
 
@@ -350,6 +353,7 @@ bool show = true;
 int window_width = 1024;
 int window_height = 1024;
 double wscale = 1;
+SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
 
 #define max(a,b) ((a) > (b) ? (a) : (b))
@@ -909,6 +913,49 @@ void loop(void)
 	cl = crflg ? "CL" : lanflg ? "L" : " ";
 }
 
+void mainloop(void)
+{
+	SDL_Event e;
+	static unsigned secs = 0;
+	if (!quit) {
+		if (SDL_PollEvent(&e)) {
+			if (e.type == SDL_QUIT) quit = true;
+			else if (
+				e.type == SDL_WINDOWEVENT &&
+				e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED
+			) {
+				window_width = e.window.data1;
+				window_height = e.window.data2;
+				wscale = max(
+					min(window_width, window_height), 1024
+				) / 1024.0;
+			}
+			else contrl(&e);
+			return;
+		}
+		contrl(NULL);
+		if (SDL_GetTicks64() / 1000 != secs) show = !show;
+		secs = SDL_GetTicks64() / 1000;
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+		SDL_RenderClear(renderer);
+		displist();
+		loop();
+		SDL_RenderPresent(renderer);
+		SDL_Delay(1000/60);
+		return;
+	}
+
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+
+	#ifdef __EMSCRIPTEN__
+	emscripten_cancel_main_loop();
+	#else
+	exit(0);
+	#endif
+}
+
 int main(void)
 {
 	crash = flt2float((struct flt){-027,0200000,0});
@@ -944,8 +991,6 @@ int main(void)
 		return EXIT_FAILURE;
 	}
 
-	SDL_Window *window;
-
 	if (SDL_CreateWindowAndRenderer(
 		window_width, window_height,
 		SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE, &window, &renderer
@@ -966,38 +1011,10 @@ int main(void)
 	SDL_SetWindowSize(window, window_width, window_height);
 
 	pbson = SDL_GetKeyboardState(NULL);
-
-	SDL_Event e;
-	unsigned secs = 0;
-	while (!quit) {
-		while (SDL_PollEvent(&e)) {
-			if (e.type == SDL_QUIT) quit = true;
-			else if (
-				e.type == SDL_WINDOWEVENT &&
-				e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED
-			) {
-				window_width = e.window.data1;
-				window_height = e.window.data2;
-				wscale = max(
-					min(window_width, window_height), 1024
-				) / 1024.0;
-			}
-			else contrl(&e);
-		}
-		contrl(NULL);
-		if (SDL_GetTicks64() / 1000 != secs) show = !show;
-		secs = SDL_GetTicks64() / 1000;
-		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-		SDL_RenderClear(renderer);
-		displist();
-		loop();
-		SDL_RenderPresent(renderer);
-		SDL_Delay(1000/60);
-	}
-
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
-	SDL_Quit();
-
+	#ifdef __EMSCRIPTEN__
+	emscripten_set_main_loop(mainloop, 0, 1);
+	#else
+	while (1) mainloop();
+	#endif
 	return 0;
 }
