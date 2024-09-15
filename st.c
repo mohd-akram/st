@@ -1011,10 +1011,12 @@ int main(void)
 	SDL_SetWindowSize(window, window_width, window_height);
 
 	pbson = SDL_GetKeyboardState(NULL);
+
 	#ifdef __EMSCRIPTEN__
 	emscripten_set_main_loop(mainloop, 0, 1);
 	#else
 	while (1) mainloop();
 	#endif
+
 	return 0;
 }
