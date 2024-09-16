@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>C port of Ken Thompson's Space Travel</title>
+    <style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: black;
+    }
+    canvas {
+      display: block;
+      max-width: calc(100% - 40px);
+      max-height: calc(100% - 40px);
+      object-fit: contain;
+      margin: 20px;
+    }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+    <script>
+        var Module = {
+            canvas: (function() { return document.getElementById('canvas'); })()
+        };
+    </script>
+    <script src="st.js"></script>
+</body>
+</html>
