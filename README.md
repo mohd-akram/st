@@ -3,7 +3,8 @@
 This is a C port of Ken Thompson's
 [Space Travel](https://en.wikipedia.org/wiki/Space_Travel_\(video_game\)),
 ported from PDP-7 assembly. The original source files are in `src/cmd/st*.s`
-in the [pdp7-unix](https://github.com/DoctorWkt/pdp7-unix) repository.
+in the [pdp7-unix](https://github.com/DoctorWkt/pdp7-unix) repository. The game
+is available to [play online](https://akr.am/st) via WebAssembly.
 
 ## Install
 
@@ -12,6 +13,10 @@ The SDL2 library is required.
 Run `make` to build `st`.
 
 Run `make install` to install to `/usr/local/bin`.
+
+Run `make wasm` (requires [Emscripten](https://emscripten.org)) to build a
+WebAssembly version of the game. To play it, launch a web server via
+`python3 -m http.server -d html` and go to http://localhost:8000.
 
 ## Controls
 

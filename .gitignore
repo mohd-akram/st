@@ -2,4 +2,6 @@
 *.obj
 *.dll
 *.exe
+*.wasm
 /st
+/html/st.js

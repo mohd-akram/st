@@ -33,7 +33,7 @@ jobs:
       - name: Setup emsdk
         uses: mymindstorm/setup-emsdk@v14
       - name: Build Space Travel
-        run: emcc st.c -s USE_SDL=2 -o html/st.js
+        run: make wasm
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

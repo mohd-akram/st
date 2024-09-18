@@ -1,5 +1,6 @@
 INSTALL = install
 MKDIR = mkdir -p
+EMCC = emcc
 
 prefix = /usr/local
 bindir = $(prefix)/bin
@@ -16,9 +17,17 @@ prefix=. # \
 !endif
 
 LDLIBS = -lm -lSDL2
+
 all: st$(EXEEXT)
+
+wasm: html/st.js
+
+html/st.js: st.c
+	$(EMCC) -s USE_SDL=2 -o $@ st.c
+
 clean:
-	$(RM) st$(EXEEXT)
+	$(RM) st$(EXEEXT) html/st.js html/*.wasm
+
 install: st$(EXEEXT) $(DESTDIR)$(bindir)
 	$(INSTALL) st$(EXEEXT) "$(DESTDIR)$(bindir)"
 
