@@ -913,10 +913,17 @@ void loop(void)
 	cl = crflg ? "CL" : lanflg ? "L" : " ";
 }
 
-void mainloop(void)
+void main_loop(void)
 {
 	SDL_Event e;
-	static unsigned secs = 0;
+	static unsigned t0 = 0, t;
+
+	t = SDL_GetTicks64();
+
+#ifdef __EMSCRIPTEN__
+	if (t - t0 < 1000/60) return;
+#endif
+
 	if (!quit) {
 		if (SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) quit = true;
@@ -934,14 +941,13 @@ void mainloop(void)
 			return;
 		}
 		contrl(NULL);
-		if (SDL_GetTicks64() / 1000 != secs) show = !show;
-		secs = SDL_GetTicks64() / 1000;
+		if (t/1000 > t0/1000) show = !show;
+		t0 = t;
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderClear(renderer);
 		displist();
 		loop();
 		SDL_RenderPresent(renderer);
-		SDL_Delay(1000/60);
 		return;
 	}
 
@@ -949,11 +955,11 @@ void mainloop(void)
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 
-	#ifdef __EMSCRIPTEN__
+#ifdef __EMSCRIPTEN__
 	emscripten_cancel_main_loop();
-	#else
+#else
 	exit(0);
-	#endif
+#endif
 }
 
 int main(void)
@@ -1012,11 +1018,14 @@ int main(void)
 
 	pbson = SDL_GetKeyboardState(NULL);
 
-	#ifdef __EMSCRIPTEN__
-	emscripten_set_main_loop(mainloop, 0, 1);
-	#else
-	while (1) mainloop();
-	#endif
+#ifdef __EMSCRIPTEN__
+	emscripten_set_main_loop(main_loop, 0, true);
+#else
+	while (1) {
+		main_loop();
+		SDL_Delay(1000/60);
+	}
+#endif
 
 	return 0;
 }
