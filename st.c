@@ -1,8 +1,9 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <stdbool.h>
 #include <math.h>
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -393,7 +394,7 @@ void vec(int x, int y, bool vis)
 	if (vis) {
 		SDL_SetRenderDrawColor(renderer, 255*br/4, 255*br/4, 255*br/4,
 			255);
-		SDL_RenderDrawLine(renderer,
+		SDL_RenderLine(renderer,
 			wscale*xpos+window_width/2,
 			window_height-(wscale*ypos+window_height/2),
 			wscale*(xpos+sz*x)+window_width/2,
@@ -523,14 +524,14 @@ void rotate(bool dir)
 }
 
 bool quit = false;
-const uint8_t *pbson;
+const bool *pbson;
 
 void contrl(const SDL_Event *e)
 {
 	if (e) {
 		switch (e->type) {
-		case SDL_KEYDOWN:
-			switch (e->key.keysym.sym) {
+		case SDL_EVENT_KEY_DOWN:
+			switch (e->key.key) {
 			case SDLK_1:
 				quit = true;
 				break;
@@ -918,7 +919,7 @@ void main_loop(void)
 	SDL_Event e;
 	static unsigned t0 = 0, t;
 
-	t = SDL_GetTicks64();
+	t = SDL_GetTicks();
 
 #ifdef __EMSCRIPTEN__
 	if (t - t0 < 1000/60) return;
@@ -926,11 +927,8 @@ void main_loop(void)
 
 	if (!quit) {
 		if (SDL_PollEvent(&e)) {
-			if (e.type == SDL_QUIT) quit = true;
-			else if (
-				e.type == SDL_WINDOWEVENT &&
-				e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED
-			) {
+			if (e.type == SDL_EVENT_QUIT) quit = true;
+			else if (e.type == SDL_EVENT_WINDOW_RESIZED) {
 				window_width = e.window.data1;
 				window_height = e.window.data2;
 				wscale = max(
@@ -991,15 +989,15 @@ int main(void)
 
 	dspsca();
 
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+	if (!SDL_Init(SDL_INIT_VIDEO)) {
 		fprintf(stderr, "Failed to initialize SDL: %s\n",
 			SDL_GetError());
 		return EXIT_FAILURE;
 	}
 
-	if (SDL_CreateWindowAndRenderer(
-		window_width, window_height,
-		SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE, &window, &renderer
+	if (!SDL_CreateWindowAndRenderer(
+		"Space Travel", window_width, window_height,
+		SDL_WINDOW_RESIZABLE, &window, &renderer
 	)) {
 		fprintf(stderr, "Failed to create window: %s\n",
 			SDL_GetError());
@@ -1007,12 +1005,11 @@ int main(void)
 		return EXIT_FAILURE;
 	}
 
-	SDL_SetWindowTitle(window, "Space Travel");
 	SDL_SetWindowMinimumSize(window, 848, 848);
 
-	SDL_DisplayMode dm;
-	SDL_GetDesktopDisplayMode(SDL_GetWindowDisplayIndex(window), &dm);
-	int size = min(min(dm.w, dm.h)-128, 1024);
+	const SDL_DisplayMode *dm =
+		SDL_GetDesktopDisplayMode(SDL_GetDisplayForWindow(window));
+	int size = min(min(dm->w, dm->h)-128, 1024);
 	window_width = window_height = size;
 	SDL_SetWindowSize(window, window_width, window_height);
 

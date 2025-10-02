@@ -8,7 +8,7 @@ is available to [play online](https://akr.am/st) via WebAssembly.
 
 ## Install
 
-The SDL2 library is required.
+The SDL3 library is required.
 
 Run `make` to build `st`.
 
