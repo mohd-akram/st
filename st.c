@@ -989,6 +989,12 @@ int main(void)
 
 	dspsca();
 
+	if (!SDL_SetAppMetadata("Space Travel", "1.0.0", "am.akr.st")) {
+		fprintf(stderr, "Failed to set app metadata: %s\n",
+			SDL_GetError());
+		return EXIT_FAILURE;
+	}
+
 	if (!SDL_Init(SDL_INIT_VIDEO)) {
 		fprintf(stderr, "Failed to initialize SDL: %s\n",
 			SDL_GetError());
