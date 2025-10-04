@@ -1,19 +1,32 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
     <title>Space Travel</title>
     <style>
       body {
         background: black;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        position: absolute;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
       }
       canvas {
-        position: absolute;
+        display: block;
+        margin: 0 auto;
         max-width: 100%;
         max-height: 100%;
+        position: relative;
         top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        transform: translateY(-50%);
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
       }
     </style>
   </head>
@@ -21,5 +34,102 @@
     <canvas id="canvas"></canvas>
     <script>Module = { canvas }</script>
     <script src="st.js"></script>
+    <script>
+      const intro =
+        "Welcome to Space Travel\n\n" +
+        "Travel to other planets and land slowly.\n\n";
+
+      const instructions =
+        intro +
+        "The arrow keys control your ship's acceleration and yaw.\n" +
+        "The keys 3 and 4 control thrust.\n\n" +
+        "If you crash, the bottom-right indicator will flash CL. " +
+        "Press 2 to try again.";
+
+      const touchInstructions =
+        intro +
+        "Swipe vertically and horizontally to control your ship's acceleration and yaw.\n" +
+        "Tap the top and bottom of the screen to control thrust.\n\n" +
+        "If you crash, the bottom-right indicator will flash CL. " +
+        "Tap anywhere to try again.";
+
+      let started = false;
+      let crashed = false;
+
+      Module.oncrash = () => (crashed = true);
+
+      document.body.onclick = () => window.alert(instructions);
+
+      function press(code, duration = 50) {
+        canvas.dispatchEvent(new KeyboardEvent("keydown", { code, bubbles: true }));
+        setTimeout(
+          () =>
+            canvas.dispatchEvent(new KeyboardEvent("keyup", { code, bubbles: true })),
+          duration
+        );
+      }
+
+      const touches = new Map();
+
+      document.body.ontouchstart = (e) => {
+        e.preventDefault();
+
+        if (!started) {
+          window.alert(touchInstructions);
+          started = true;
+          return;
+        }
+
+        if (crashed) {
+          press("Digit2");
+          crashed = false;
+          return;
+        }
+
+        for (const t of e.changedTouches)
+          touches.set(t.identifier, { x: t.pageX, y: t.pageY });
+      };
+
+      document.body.ontouchmove = (e) => {
+        e.preventDefault();
+
+        for (const t of e.changedTouches) {
+          const touch = touches.get(t.identifier);
+          if (!touch) continue;
+
+          const dx = t.pageX - touch.x;
+          const dy = t.pageY - touch.y;
+
+          const distance = Math.hypot(dx, dy);
+
+          if (Math.abs(dx) > Math.abs(dy))
+            press(dx < 0 ? "ArrowLeft" : "ArrowRight", 50 * distance);
+          else {
+            if (distance < 10) continue;
+            press(dy > 0 ? "ArrowUp" : "ArrowDown", 50 * distance);
+          }
+
+          touch.x = t.pageX;
+          touch.y = t.pageY;
+          touch.handled = true;
+        }
+      };
+
+      document.body.ontouchend = (e) => {
+        e.preventDefault();
+
+        for (const t of e.changedTouches) {
+          const touch = touches.get(t.identifier);
+          touches.delete(t.identifier);
+          if (!touch || touch.handled) continue;
+          press(2 * e.pageY < window.innerHeight ? "Digit3" : "Digit4");
+        }
+      };
+
+      document.body.ontouchcancel = (e) => {
+        e.preventDefault();
+        for (const t of e.changedTouches) touches.delete(t.identifier);
+      };
+    </script>
   </body>
 </html>

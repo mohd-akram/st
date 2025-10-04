@@ -683,6 +683,9 @@ void updacc(int p)
 			if (!lanflg) {
 				if (ftmp1 * ftmp1 + ftmp2 * ftmp2 > crash) {
 					crflg = goflg = true;
+#ifdef __EMSCRIPTEN__
+					EM_ASM(Module.oncrash());
+#endif
 				}
 				lanflg = true;
 				ftmp1 = rpar / dpar;
