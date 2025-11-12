@@ -98,7 +98,7 @@ struct flt {
 	int m2;		// 18-36
 };
 
-/* All values use earth's radius as the base distance unit (RE) */
+/* All values use earth's radius (R_E) as the base distance unit */
 
 // Planet radius squared
 double prsq[32];
@@ -250,7 +250,7 @@ const struct flt py_[] = {
 
 double pw[32];
 
-// Planet orbit velocity in radians squared
+// Planet negative orbital angular velocity squared (i.e. -GM/r^3)
 double pww[32];
 const struct flt pww_[] = {
 	{0000,0000000,0000000},
@@ -617,6 +617,7 @@ void invert(int p)
 	updpln(p);
 }
 
+/* Get floating-point error of absxy */
 void absv(int p)
 {
 	absx = absy = 0;
@@ -635,7 +636,7 @@ void absv(int p)
 	}
 }
 
-/* Get absolute planet position */
+/* Get planet absolute position */
 void absxy(int p)
 {
 	// get distance from planet to sun
@@ -650,7 +651,7 @@ void absxy(int p)
 	return;
 }
 
-/* Set absolute ship position */
+/* Set ship absolute position */
 void shipxy(void)
 {
 	shipx = -(absx + x);
@@ -855,11 +856,11 @@ void updshp(void)
 	// return if we're already set to the planet with strongest gravity
 	if (par == maxj) return;
 
-	// update ship position
+	// update ship absolute position
 	absxy(par);
 	shipxy();
 
-	// ??
+	// get dx and dy
 	absv(par);
 	ox = absx + x - ox;
 	oy = absy + y - oy;
@@ -867,12 +868,12 @@ void updshp(void)
 	// set the current planet to the one with strongest gravity
 	par = maxj;
 
-	// ??
+	// get -dx and -dy
 	absv(par);
 	ox = absx - ox;
 	oy = absy - oy;
 
-	// set new relative position
+	// update ship relative position
 	absxy(par);
 	x = -(absx + shipx);
 	ox += x;
