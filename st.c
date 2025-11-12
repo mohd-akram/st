@@ -509,17 +509,14 @@ void dspsca(void)
 void rotate(bool dir)
 {
 	double ftmp1 = cphi * sdphi;
-
 	if (!dir) ftmp1 = -ftmp1;
 
 	double ftmp2 = sphi * cdphi + ftmp1;
 
 	ftmp1 = sphi * sdphi;
-
 	if (dir) ftmp1 = -ftmp1;
 
 	cphi = cphi * cdphi + ftmp1;
-
 	sphi = ftmp2;
 }
 
@@ -680,37 +677,32 @@ void updacc(int p)
 		double ftmp2 = oy - y;
 		horizv = (ftmp2 * x + ftmp1 * y) / dpar;
 		// if distance from planet less than radius
-		if (dpar < rpar) {
-			if (!lanflg) {
-				if (ftmp1 * ftmp1 + ftmp2 * ftmp2 > crash) {
-					crflg = goflg = true;
+		if (dpar < rpar && !lanflg) {
+			if (ftmp1 * ftmp1 + ftmp2 * ftmp2 > crash) {
+				crflg = goflg = true;
 #ifdef __EMSCRIPTEN__
-					EM_ASM(Module.oncrash());
+				EM_ASM(Module.oncrash());
 #endif
-				}
-				lanflg = true;
-				ftmp1 = rpar / dpar;
-				// reset x and y to the edge of the planet
-				x *= ftmp1;
-				ox = x;
-				y *= ftmp1;
-				oy = y;
-				absxy(par);
-				shipxy();
-				updacc(par);
 			}
+			lanflg = true;
+			ftmp1 = rpar / dpar;
+			// reset x and y to the edge of the planet
+			x *= ftmp1;
+			ox = x;
+			y *= ftmp1;
+			oy = y;
+			absxy(par);
+			shipxy();
+			updacc(par);
 		}
 	}
 
 	/* upda5 */
 	// if the planet is too far, set a flag to not draw its border
-	// and ignore its gravity
-	if (dpar > fardst) {
-		// unless it's the sun
-		if (p) {
-			grvflg = true;
-			return;
-		}
+	// and ignore its gravity unless it's the sun
+	if (dpar > fardst && p) {
+		grvflg = true;
+		return;
 	}
 	grvflg = false;
 
@@ -960,7 +952,7 @@ void main_loop(void)
 #ifdef __EMSCRIPTEN__
 	emscripten_cancel_main_loop();
 #else
-	exit(0);
+	exit(EXIT_SUCCESS);
 #endif
 }
 
@@ -1028,11 +1020,11 @@ int main(void)
 #ifdef __EMSCRIPTEN__
 	emscripten_set_main_loop(main_loop, 0, true);
 #else
-	while (1) {
+	while (true) {
 		main_loop();
 		SDL_Delay(1000/60);
 	}
 #endif
 
-	return 0;
+	return EXIT_SUCCESS;
 }
